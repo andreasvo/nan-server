@@ -50,6 +50,22 @@ void handleRequest() {
 	file[j+1] = '\0';
 
 	// GET, SEARCH request
+	char* check = malloc(18);
+	check[j+1] = '\0';
+	memcpy(check, file, 18);
+	int sc = 0;
+	if(0 == strcmp(req, "GET") && 0 == strcmp(check, "/webroot/incoming/")) {
+		int y = 18;
+		while (file[y] != ' ')
+			sc++;
+
+		if (0 == sc) {
+			sql_handle ("/db/database.db", 0, -1, -1, -1, "");
+			exit(0);
+		}	
+	}
+
+	
 
 	// POST or PUT request
 	if (0 == strcmp(req, "POST") || 0 == strcmp(req, "PUT")) {
@@ -72,17 +88,28 @@ void handleRequest() {
 			i++;	
 		}
 
-		//if (0 == strcmp(file, "/webroot/incoming")) {
-
 		char* xml_buf = malloc(byte_counter+1 - i);
 		memcpy(xml_buf, buffer + i, byte_counter-i);
 		xml_buf[i+1] = '\0';
 
-		xml_parse(xml_buf, 1, 0);
+		if (0 ==  strcmp(req, "POST")) {
+			xml_parse(xml_buf, 1);
+			exit(0);
+		}
 
+		else if (0 == strcmp(req, "PUT")) {
+			xml_parse(xml_buf, 2);
+			exit(0);
+		} else {
+			printf("Something went wrong!");
+			exit(0);
+		}
+	}
+
+	// DELETE
+	if (0 == strcmp(req, "DELETE")) {
+		sql_handle("/db/database.db", 3, -1, -1, -1, "");
 		exit(0);
-
-//		}
 	}
 	
 	else if (j > 1) {

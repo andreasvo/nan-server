@@ -8,13 +8,14 @@
 // Handles xml parsing and sql actions for server.c via handle.c that calls it
 // Andreas Vestgarden Olsen (March 2017)
 
-void xml_parse(char* buf, int action, int flag);
+void xml_parse(char* buf, int action);
 static int sql_handle (char* db_path, int action, int flag, int id, int tlf, char* name);
 static int callback(void *NotUsed, int argc, char **argv, char **azColName);
 
-void xml_parse(char* buf, int action, int flag) {
+void xml_parse(char* buf, int action) {
 
     int i, j, k, input_size, id, tlf;
+    int flag = 0;
     char* name;
     char* temp1;
     char* temp2;
@@ -31,7 +32,7 @@ void xml_parse(char* buf, int action, int flag) {
         if (buf[i] == '<' && buf[i+1] == 'i' && buf[i+2] == 'd' && buf[i+3] == '>') {
             j = i+4;
             input_size = 0;
-            while (buf[j] != '<' && buf[j+1] != '/' && buf[j+2] != 'i' && input_size < 25) {
+            while (buf[j] != '<' && buf[j+1] != '/' && buf[j+2] != 'i') {
                 input_size++;
                 j++;
             }
@@ -45,7 +46,7 @@ void xml_parse(char* buf, int action, int flag) {
         if (buf[i] == '<' && buf[i+1] == 't' && buf[i+2] == 'l' && buf[i+3] == 'f' && buf[i+4] == '>') {
             j = i+5;
             input_size = 0;
-            while (buf[j] != '<' && buf[j+1] != '/' && buf[j+2] != 't' && input_size < 25) {
+            while (buf[j] != '<' && buf[j+1] != '/' && buf[j+2] != 't') {
                 input_size++;
                 j++;
             }
@@ -82,38 +83,53 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
     char* zErrMsg = 0;
     int rc;
     char* sql;
+    char* actionType = malloc(15);
 
     sql = (char*) malloc(99);
     rc = sqlite3_open(db_path, &db);
 
-    action = 1;
-    if(rc == 0) {
-        printf("Successfully connected to database\n");
+    if(rc != 0) {
+        printf("sql.c error: Could not connect to database!\n");
     }
     /* Choose sql action */
     if (0 == action) {
-
+        snprintf(sql, 99, "SELECT * FROM Phonebook;");
+        actionType = "search";
     }
 
     else if (1 == action) {
+        if (-1 == flag) {
+            snprintf(sql, 99, "INSERT INTO Phonebook(id, tlf) VALUES(%d, %d);", id, tlf);
+        } else {
+            snprintf(sql, 99, "INSERT INTO Phonebook(id, tlf, name) VALUES(%d, %d, '%s');", id, tlf, name);
+        }
+
+        actionType = "insert";
+    }
+
+    else if (2 == action) {
         if (-1 == flag) {
             snprintf(sql, 99, "INSERT OR REPLACE INTO Phonebook(id, tlf) VALUES(%d, %d);", id, tlf);
         } else {
             snprintf(sql, 99, "INSERT OR REPLACE INTO Phonebook(id, tlf, name) VALUES(%d, %d, '%s');", id, tlf, name);
         }
+
+        actionType = "update";
     }
 
-    else if (2 == action) {
-
+    else if (3 == action) {
+        snprintf(sql, 99, "DELETE FROM Phonebook;");
+        actionType = "delete";
     }
 
+    printf("%s", sql);
     /* Execute SQL statement */
    rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
    if ( rc != SQLITE_OK ) {
-      fprintf(stderr, "SQL error: %s\n", zErrMsg);
+      fprintf(stdout, "SQL error: %s\n", zErrMsg);
       sqlite3_free(zErrMsg);
    } else {
-      fprintf(stdout, "Inserted Successfully\n");
+      fprintf(stdout, "Successful %s\n", actionType);
    }
    
    sqlite3_close(db);
