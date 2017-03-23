@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS Phonebook (
+	
+	id INTEGER NOT NULL,
+	tlf INTEGER NOT NULL,
+	name VARCHAR(25),
+
+	PRIMARY KEY (id)
+);

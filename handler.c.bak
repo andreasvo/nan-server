@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <string.h>
+
+// This program is a get/post request handler for a c webserver.
+// to call the function in other programs, keep in same folder and use #include "handler.c" then call "handleRequest();"
+
+#define BUFFSIZE 8000
+
+void handleRequest() {
+
+	int i = 0;
+	int j = 0;
+	int a = 0;
+	int k = 0;
+	int bytes;
+	int size = BUFFSIZE;
+	char test;
+	int byte_counter = 0;
+	char* buffer = malloc(BUFFSIZE);
+
+	byte_counter = read(0, buffer, BUFFSIZE);
+
+	while (buffer[i] != ' ') {
+		test = buffer[i];
+		i++;
+	}
+
+	while (buffer[(i+j)+1] != ' ') {
+		test = buffer[i+j+1];
+		j++;
+	}
+
+	while(buffer[(i+a)+1] != '.') {
+		test = buffer[(i+a)+1];
+		a++;
+	}
+
+	while (buffer[(i+a+k)+2] != ' ') {
+		test = buffer[(i+a+k)+2];
+		k++;
+	}
+		
+	 
+	char* req = malloc(i+1);
+	char* file = malloc(j+1);
+	char* type = malloc(k+1);
+	char* mime;
+
+	memcpy(req, buffer, i); 
+	req[i+1] = '\0';
+	memcpy(file, buffer+i+1, j);
+	file[j+1] = '\0';
+	memcpy(type, buffer+i+a+2, k);
+	type[k+1] = '\0';
+
+	
+	// If file is not specified in url, finds index.html as default
+	if (j == 1)
+		file = "/index.html";
+
+	// Checks if image	
+	if (strcmp(type, "png") || strcmp(type, "jpg")) {
+		mime = malloc(6);
+		mime = "image";
+	}
+
+	// checks if xml and/or xsl
+	else if (strcmp(type, "xsl") || strcmp(type, "xslt+xml") || strcmp(type, "xml") || strcmp(type, "xml-dtd") || strcmp(type, "javascript")) {
+		mime = malloc(12);
+		mime = "application"; 
+
+	// else sets texts as default	
+	} else {
+		mime = malloc(5);
+		mime = "text";
+	}
+
+	int fd = open(file, O_RDONLY);
+
+	//checks if file exsists
+	if (-1 == fd) {
+		printf("HTTP/1.1 404 Not Found\n");
+		printf("Content-Type: text/html\n\n");
+		file = "404.html";
+	}
+	
+	// Return head only
+	else if (0 == strcmp(req, "HEAD")) {
+		printf("HTTP/1.1 200 OK\n");
+		printf("Content-Type: %s/%s\n\n", mime, type);
+		exit(0);
+
+	} else {
+
+		printf("HTTP/1.1 200 OK\n");
+		printf("Content-Type %s/%s\n\n", mime, type);
+	}
+
+	bytes = 0;
+	while (bytes = read(fd, buffer, BUFFSIZE)) {
+		byte_counter = bytes;
+		write(1, buffer, bytes);
+	}
+}

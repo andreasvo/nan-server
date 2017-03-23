@@ -1,0 +1,7 @@
+sqlite3 database.db "INSERT INTO Person(id, tlf, navn) VALUES(01, 90790741, 'Andreas');"
+sqlite3 database.db "INSERT INTO Person(id, tlf, navn) VALUES(02, 90513832, 'Siri');"
+sqlite3 database.db "INSERT INTO Person(id, tlf, navn) VALUES(03, 91769801, 'Jon');"
+sqlite3 database.db "INSERT INTO Person(id, tlf) VALUES(04, 86049677);"
+sqlite3 database.db "INSERT INTO Person(id, tlf) VALUES(05, 52745742);"
+sqlite3 database.db "INSERT INTO Person(id, tlf) VALUES(06, 93215931);"
+

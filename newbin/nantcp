@@ -1,0 +1,27 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GRN='\033[1;32m'
+NC='\033[0m'
+
+if [ "$1" == "stop" ]
+then
+	printf "[${RED}STOPPED${NC}] tcp_nan\n"
+	sudo killall tcp_nan
+
+elif [ "$1" == "start" ]
+then
+	printf "[${GRN}RUNNING${NC}] tcp_nan\n"
+	gcc /home/andreas/webroot/server.c -o /home/andreas/webroot/tcp_nan -l sqlite3
+	sudo /home/andreas/webroot/tcp_nan
+
+elif [ "$1" == "restart" ]
+then
+	printf "[${GRN}RESTARTING${NC}] tcp_nan\n"
+	sudo killall tcp_nan
+	gcc /home/andreas/webroot/server.c -o /home/andreas/webroot/tcp_nan -l sqlite3
+	sudo /home/andreas/webroot/tcp_nan
+	
+else
+	printf "No specified actions were given\nNothing happening here..\n"
+fi

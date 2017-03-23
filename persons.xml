@@ -1,0 +1,9 @@
+<?xml version"1.0"?>
+
+<phonebook>
+    <person>
+        <id>01</id>
+        <tlf>11223344</tlf>
+        <name>Emil</name>
+    </person>
+</phonebook>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Andreas' SQL</title>
+		<link rel="stylesheet" type="text/css" href="main.css">
+	</head>
+
+	<body>
+		<h1>SQL Page</h1>
+		<li> <a href="index.html">Home</a> </li><br>
+
+		<form id="the_form">
+			ID:<br>
+				<input type="text" name="ID"><br>
+			TLF:<br>
+				<input type="text" name="TLF" maxlength="8"><br>
+			Name:<br>
+				<input type="text" name="NAME" maxlength="25">
+		</form><br>
+		
+		<button id="searchButton">search</button>
+		<button id="insertButton">insert</button>
+		<button id="updateButton">update</button>
+		<button id="deleteButton">delete</button>
+
+		<div class="alert">
+		  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+		  <strong>Danger!</strong> Indicates a dangerous or potentially negative action.
+		</div>
+	</body>
+
+	<script src="phonebook.js"></script>
+</html>
