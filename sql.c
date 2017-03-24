@@ -56,7 +56,7 @@ void xml_parse(char* buf, int action) {
             free(temp2);
         }
 
-        /* name extraction */ 
+        // name extraction
         if (buf[i] == '<' && buf[i+1] == 'n' && buf[i+2] == 'a' && buf[i+3] == 'm' && buf[i+4] == 'e' && buf[i+5] == '>') {
             j = i+6;
             input_size = 0;
@@ -76,6 +76,7 @@ void xml_parse(char* buf, int action) {
     }
 
     sql_handle("/db/database.db", action, flag, id, tlf, name);
+    free(name);
 }
 
 static int sql_handle (char* db_path, int action, int flag, int id, int tlf, char* name) {
@@ -91,9 +92,14 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
     if(rc != 0) {
         printf("sql.c error: Could not connect to database!\n");
     }
+
     /* Choose sql action */
     if (0 == action) {
-        snprintf(sql, 99, "SELECT * FROM Phonebook;");
+        if (-1 == id) {
+            snprintf(sql, 99, "SELECT * FROM Phonebook;");
+        } else {
+            snprintf(sql, 99, "SELECT * FROM Phonebook WHERE id=%d", id);
+        }
         actionType = "search";
     }
 
@@ -109,9 +115,9 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
 
     else if (2 == action) {
         if (-1 == flag) {
-            snprintf(sql, 99, "INSERT OR REPLACE INTO Phonebook(id, tlf) VALUES(%d, %d);", id, tlf);
+            snprintf(sql, 99, "UPDATE OR ABORT Phonebook SET tlf=%d, name='' WHERE id=%d;", tlf, id);
         } else {
-            snprintf(sql, 99, "INSERT OR REPLACE INTO Phonebook(id, tlf, name) VALUES(%d, %d, '%s');", id, tlf, name);
+            snprintf(sql, 99, "UPDATE OR ABORT Phonebook SET tlf=%d, name='%s' WHERE id=%d;", tlf, name, id);
         }
 
         actionType = "update";
@@ -122,7 +128,6 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
         actionType = "delete";
     }
 
-    printf("%s", sql);
     /* Execute SQL statement */
    rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
    if ( rc != SQLITE_OK ) {
@@ -131,12 +136,15 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
    } else {
       fprintf(stdout, "Successful %s\n", actionType);
    }
+
+   
    
    sqlite3_close(db);
    return 0;
 }
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName){
+
    int i;
    for(i=0; i<argc; i++){
       printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");

@@ -10,7 +10,7 @@
 // Personal include:
 #include "sql.c"
 
-// This program is a get/head/post request handler for a the "server.c" webserver.
+// This program is a get/head/post/put/delete request handler for a the "server.c" webserver.
 // to call the function in other programs, keep in same folder and use #include "handler.c" then call "handleRequest();"
 
 #define BUFFSIZE 8000
@@ -51,21 +51,24 @@ void handleRequest() {
 
 	// GET, SEARCH request
 	char* check = malloc(18);
+	char* delete_id;
 	check[j+1] = '\0';
 	memcpy(check, file, 18);
-	int sc = 0;
 	if(0 == strcmp(req, "GET") && 0 == strcmp(check, "/webroot/incoming/")) {
 		int y = 18;
 		while (file[y] != ' ')
-			sc++;
+			y++;
 
-		if (0 == sc) {
-			sql_handle ("/db/database.db", 0, -1, -1, -1, "");
+		delete_id = (char*) malloc(y-18);	
+		memcpy(delete_id, file+y+1, y-18);	
+
+		if (0 == y-18) {
+			sql_handle ("./db/database.db", 0, -1, -1, -1, "");
 			exit(0);
-		}	
+		} else {
+			xml_parse (delete_id, 0);
+		}
 	}
-
-	
 
 	// POST or PUT request
 	if (0 == strcmp(req, "POST") || 0 == strcmp(req, "PUT")) {

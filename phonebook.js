@@ -5,8 +5,6 @@ function searchFunct() {
 	var path;
 	xml_req = new XMLHttpRequest();
 
-
-
 	if(id) {
 		path = "/webroot/incoming/"+id;
 	} else {
@@ -19,7 +17,10 @@ function searchFunct() {
 
 	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			alert(xml_req.responseText);
+			document.getElementById("response").innerHTML=xml_req.responseText;
+			if(!xml_req.responseText){
+				document.getElementById("response").innerHTML="Empty response, sorry!";
+			}
 		}
 	}
 }
@@ -53,7 +54,10 @@ function insertFunct() {
 
 	xml_req.onreadystatechange = function(){
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			alert(xml_req.responseText);
+			document.getElementById("response").innerHTML=xml_req.responseText;
+			if(!xml_req.responseText){
+				document.getElementById("response").innerHTML="Empty response, sorry!";
+			}
 		}
 	}
 }
@@ -69,7 +73,7 @@ function updateFunct() {
 	}
 
 	if (!id) {
-		alert('ID cannot be empty!');
+		alert('ID cannot be empty!')
 		return;
 	}
 
@@ -87,7 +91,10 @@ function updateFunct() {
 
 	xml_req.onreadystatechange = function(){
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			alert(xml_req.responseText);
+			document.getElementById("response").innerHTML=xml_req.responseText;
+			if(!xml_req.responseText){
+				document.getElementById("response").innerHTML="Empty response, sorry!";
+			}
 		}
 	}
 }
@@ -101,7 +108,10 @@ function deleteFunct() {
 
 	xml_req.onreadystatechange = function(){
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			alert(xml_req.responseText);
+			document.getElementById("response").innerHTML=xml_req.responseText;
+			if(!xml_req.responseText){
+				document.getElementById("response").innerHTML="Empty response, sorry!";
+			}
 		}
 	}
 }
@@ -120,11 +130,3 @@ window.addEventListener("load", function() {
 	document.getElementById("deleteButton").addEventListener("click", deleteFunct, false);
 
 });
-
-/*
-var r = confirm("Press a button");
-if (r == true) {
-    x = "You pressed OK!";
-} else {
-    x = "You pressed Cancel!";
-} */
