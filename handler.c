@@ -49,24 +49,20 @@ void handleRequest() {
 	memcpy(file, buffer+i+1, j);
 	file[j+1] = '\0';
 
-	// GET, SEARCH request
-	char* check = malloc(18);
-	char* delete_id;
-	check[j+1] = '\0';
-	memcpy(check, file, 18);
-	if(0 == strcmp(req, "GET") && 0 == strcmp(check, "/webroot/incoming/")) {
-		int y = 18;
-		while (file[y] != ' ')
-			y++;
+	// GET, DELETE request
+	if(0 == strcmp(req, "DELETE")) {
 
-		delete_id = (char*) malloc(y-18);	
-		memcpy(delete_id, file+y+1, y-18);	
+		char* sw;
+		sw = (char*) malloc((j)-18);
+		memcpy(sw, file+18, (j)-18);
+		int id = atoi(sw);
 
-		if (0 == y-18) {
-			sql_handle ("./db/database.db", 0, -1, -1, -1, "");
+		if (18 != j) {
+			sql_handle ("/db/database.db", 3, -1, id, -1, "");
 			exit(0);
 		} else {
-			xml_parse (delete_id, 0);
+			sql_handle ("/db/database.db", 3, -1, -1, -1, "");
+			exit(0);
 		}
 	}
 
@@ -108,14 +104,8 @@ void handleRequest() {
 			exit(0);
 		}
 	}
-
-	// DELETE
-	if (0 == strcmp(req, "DELETE")) {
-		sql_handle("/db/database.db", 3, -1, -1, -1, "");
-		exit(0);
-	}
 	
-	else if (j > 1) {
+	if (j > 1) {
 		// grabs the filetype
 		while (buffer[(i+a)+1] != '.') {
 			test = buffer[(i+a)+1];

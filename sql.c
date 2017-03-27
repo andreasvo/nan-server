@@ -91,6 +91,7 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
 
     if(rc != 0) {
         printf("sql.c error: Could not connect to database!\n");
+        exit(1);
     }
 
     /* Choose sql action */
@@ -124,7 +125,11 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
     }
 
     else if (3 == action) {
-        snprintf(sql, 99, "DELETE FROM Phonebook;");
+        if (-1 == id) {
+            snprintf(sql, 99, "DELETE FROM Phonebook;");
+        } else {
+            snprintf(sql, 99, "DELETE FROM Phonebook WHERE id=%d", id);
+        }
         actionType = "delete";
     }
 
