@@ -115,9 +115,9 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
 
     else if (2 == action) {
         if (-1 == flag) {
-            snprintf(sql, 99, "UPDATE OR ABORT Phonebook SET tlf=%d, name='' WHERE id=%d;", tlf, id);
+            snprintf(sql, 99, "UPDATE Phonebook SET tlf=%d, name='' WHERE id=%d;", tlf, id);
         } else {
-            snprintf(sql, 99, "UPDATE OR ABORT Phonebook SET tlf=%d, name='%s' WHERE id=%d;", tlf, name, id);
+            snprintf(sql, 99, "UPDATE Phonebook SET tlf=%d, name='%s' WHERE id=%d;", tlf, name, id);
         }
 
         actionType = "update";
@@ -129,19 +129,19 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
     }
 
     /* Execute SQL statement */
-   rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
-   if ( rc != SQLITE_OK ) {
-      fprintf(stdout, "SQL error: %s\n", zErrMsg);
-      sqlite3_free(zErrMsg);
-   } else {
-      fprintf(stdout, "Successful %s\n", actionType);
-   }
+    printf("HTTP/1.1 200 OK\n");
+    printf("Content-Type: text/plain\n\n");
 
-   
-   
-   sqlite3_close(db);
-   return 0;
-}
+    rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+    if ( rc != SQLITE_OK ) {
+       fprintf(stdout, "SQL error: %s\n", zErrMsg);
+       sqlite3_free(zErrMsg);
+    } else {
+       fprintf(stdout, "Successful %s\n", actionType);
+    }
+      sqlite3_close(db);
+      return 0;
+    }
 
 static int callback(void *NotUsed, int argc, char **argv, char **azColName){
 
