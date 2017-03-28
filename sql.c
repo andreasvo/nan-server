@@ -11,6 +11,7 @@
 void xml_parse(char* buf, int action);
 static int sql_handle (char* db_path, int action, int flag, int id, int tlf, char* name);
 static int callback(void *NotUsed, int argc, char **argv, char **azColName);
+static int select_callback(void *NotUsed, int argc, char **argv, char **azColName);
 
 void xml_parse(char* buf, int action) {
 
@@ -134,14 +135,26 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
     }
 
     /* Execute SQL statement */
-    printf("HTTP/1.1 200 OK\n");
-    printf("Content-Type: text/plain\n\n");
 
-    rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+
+    if (0 == action) {
+        printf("HTTP/1.1 200 OK\n");
+        printf("Content-Type: application/xml\n\n");
+        printf("<phonebook>");
+        rc = sqlite3_exec(db, sql, select_callback, 0, &zErrMsg);
+        printf("</phonebook>");
+    } else {
+        printf("HTTP/1.1 200 OK\n");
+        printf("Content-Type: text/plain\n\n");
+        rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+    }
+
     if ( rc != SQLITE_OK ) {
        fprintf(stdout, "SQL error: %s\n", zErrMsg);
        sqlite3_free(zErrMsg);
-    } else {
+    } 
+    
+    else if (0 != action) {
        fprintf(stdout, "Successful %s\n", actionType);
     }
       sqlite3_close(db);
@@ -153,7 +166,40 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName){
    int i;
    for(i=0; i<argc; i++){
       printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+
    }
    printf("\n");
    return 0;
 }
+
+static int select_callback(void *NotUsed, int argc, char **argv, char **azColName){
+   
+   //printf("<phonebook>");
+   
+   int i;
+   int person_count = 0;
+   for(i=0; i<argc; i++) {
+
+       if (0 == person_count) {
+           printf("<person>");
+           printf("<id>%s</id>", argv[i] ? argv[i] : "");
+       }
+
+       else if (1 == person_count) {
+           printf("<tlf>%s</tlf>", argv[i] ? argv[i] : "");
+       }
+
+       else if(2 == person_count) {
+           printf("<name>%s</name>", argv[i] ? argv[i] : "");
+       }
+
+       if (3 == person_count) {
+           printf("</person>");
+           person_count = 0;
+       } else {
+           person_count++;
+       }
+   }
+   return 0;
+}
+

@@ -26,10 +26,27 @@ function searchFunct() {
 
 	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			document.getElementById("response").innerHTML=xml_req.responseText;
-			if(!xml_req.responseText){
+			//document.getElementById("response").innerHTML=xml_req.responseText;			
+			if(!xml_req.responseText) {
 				document.getElementById("response").innerHTML="Empty response, sorry!";
 			}
+
+			var xml_response = xml_req.responseText;
+			var i;
+			var table="<tr><th>ID</th><th>TLF</th><</tr>";
+		  	var x = xml_response.getElementsByTagName("person");
+		  	
+		  	for (i = 0; i < x.length; i++) { 
+			    table += "<tr><td>" +
+			    x[i].getElementsByTagName("id")[0].childNodes[0].nodeValue +
+			    "</td><td>" +
+			    x[i].getElementsByTagName("tlf")[0].childNodes[0].nodeValue +
+			    "</td><td>" +
+			    x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue +
+			    "</td></tr>";
+		  	}
+
+		  	document.getElementById("outputTable").innerHTML = table;
 		}
 	}
 }

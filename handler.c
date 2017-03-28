@@ -49,8 +49,11 @@ void handleRequest() {
 	memcpy(file, buffer+i+1, j);
 	file[j+1] = '\0';
 
-	// GET, DELETE request
-	if(0 == strcmp(req, "DELETE")) {
+	char* check = (char*) malloc(18);
+	memcpy(check, file, 18);
+
+	// GET: SEARCH and DELETE request
+	if((0 == strcmp(req, "DELETE") || 0 == strcmp(req, "GET")) && 0 == strcmp(check, "/webroot/incoming/")) {
 
 		char* sw;
 		sw = (char*) malloc((j)-18);
@@ -58,10 +61,19 @@ void handleRequest() {
 		int id = atoi(sw);
 
 		if (18 != j) {
-			sql_handle ("/db/database.db", 3, -1, id, -1, "");
+			if (0 == strcmp(req, "GET")) 
+				sql_handle ("/db/database.db", 0, -1, id, -1, "");
+			else if (0 == strcmp(req, "DELETE"))
+				sql_handle ("/db/database.db", 3, -1, id, -1, "");
+			
 			exit(0);
+
 		} else {
-			sql_handle ("/db/database.db", 3, -1, -1, -1, "");
+			if (0 == strcmp(req, "GET")) 
+				sql_handle ("/db/database.db", 0, -1, -1, -1, "");
+			else if (0 == strcmp(req, "DELETE"))
+				sql_handle ("/db/database.db", 3, -1, -1, -1, "");
+
 			exit(0);
 		}
 	}
