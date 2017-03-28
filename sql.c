@@ -193,7 +193,7 @@ static int select_callback(void *NotUsed, int argc, char **argv, char **azColNam
            printf("<name>%s</name>", argv[i] ? argv[i] : "");
        }
 
-       if (3 == person_count) {
+       if (2 == person_count) {
            printf("</person>");
            person_count = 0;
        } else {

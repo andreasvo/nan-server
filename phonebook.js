@@ -1,11 +1,36 @@
 window.addEventListener("load", function() {
-
 	document.getElementById("searchButton").addEventListener("click", searchFunct, false);
 	document.getElementById("insertButton").addEventListener("click", insertFunct, false);
 	document.getElementById("updateButton").addEventListener("click", updateFunct, false);
 	document.getElementById("deleteButton").addEventListener("click", deleteFunct, false);
-
+	document.getElementById("resetButton").addEventListener("click", resetFunct, false);
 });
+
+function tableFunct(xml) {
+
+	var i;
+	var xml_string = xml.responseText;
+	var parser = new DOMParser();
+
+	var doc = parser.parseFromString(xml_string, "application/xml");
+
+	var table="<tr><th>ID</th><th>TLF</th><th>Name</th></tr>";
+  	var x = doc.getElementsByTagName("person");
+  	for (i = 0; i <x.length; i++) { 
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("id")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("tlf")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+
+	}
+
+ 	document.getElementById("response").innerHTML = "Database output:";
+ 	document.getElementById("outputTable").innerHTML = table;
+
+}
 
 function searchFunct() {
 	var id = document.getElementsByName("ID")[0].value;
@@ -26,27 +51,10 @@ function searchFunct() {
 
 	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			//document.getElementById("response").innerHTML=xml_req.responseText;			
+			tableFunct(this);		
 			if(!xml_req.responseText) {
 				document.getElementById("response").innerHTML="Empty response, sorry!";
 			}
-
-			var xml_response = xml_req.responseText;
-			var i;
-			var table="<tr><th>ID</th><th>TLF</th><</tr>";
-		  	var x = xml_response.getElementsByTagName("person");
-		  	
-		  	for (i = 0; i < x.length; i++) { 
-			    table += "<tr><td>" +
-			    x[i].getElementsByTagName("id")[0].childNodes[0].nodeValue +
-			    "</td><td>" +
-			    x[i].getElementsByTagName("tlf")[0].childNodes[0].nodeValue +
-			    "</td><td>" +
-			    x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue +
-			    "</td></tr>";
-		  	}
-
-		  	document.getElementById("outputTable").innerHTML = table;
 		}
 	}
 }
@@ -80,7 +88,9 @@ function insertFunct() {
 
 	xml_req.onreadystatechange = function(){
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
+			
 			document.getElementById("response").innerHTML=xml_req.responseText;
+
 			if(!xml_req.responseText){
 				document.getElementById("response").innerHTML="Empty response, sorry!";
 			}
@@ -117,7 +127,9 @@ function updateFunct() {
 
 	xml_req.onreadystatechange = function(){
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
+
 			document.getElementById("response").innerHTML=xml_req.responseText;
+
 			if(!xml_req.responseText){
 				document.getElementById("response").innerHTML="Empty response, sorry!";
 			}
@@ -144,9 +156,11 @@ function deleteFunct() {
 
 	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
+
 			document.getElementById("response").innerHTML=xml_req.responseText;
+
 			if(!xml_req.responseText){
-				document.getElementById("response").innerHTML="Empty response, sorry! lol";
+				document.getElementById("response").innerHTML="Empty response, sorry!";
 			}
 		}
 	}
