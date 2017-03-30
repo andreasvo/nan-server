@@ -131,6 +131,7 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
         } else {
             snprintf(sql, 99, "DELETE FROM Phonebook WHERE id=%d", id);
         }
+
         actionType = "delete";
     }
 
