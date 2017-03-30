@@ -2,15 +2,7 @@
 <html>
 	<head>
 		<title>Database App</title>
-		<!--link rel="stylesheet" type="text/css" href="main.css"-->
-		<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
-		<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
-		<link rel="stylesheet" type="text/css" href="css/jquery.easy-gallery.css">
-		<link rel="stylesheet" type="text/css" href="css/menu_style.css">
-		<link rel="stylesheet" type="text/css" href="css/simplelightbox.css">
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-		<link rel="stylesheet" type="text/css" href="css/style11.css">
+		<link rel="stylesheet" type="text/css" href="main.css">
 
 	</head>
 
@@ -18,7 +10,7 @@
 		<h1>SQL Page</h1>
 		<li> <a href="index.html">Home</a> </li><br>
 
-		<form id="the_form">
+		<form id="form">
 			ID:<br>
 				<input type="text" name="ID"><br>
 			TLF:<br>
@@ -26,7 +18,7 @@
 			Name:<br>
 				<input type="text" name="NAME" maxlength="25">
 		</form><br>
-		
+
 		<button id="searchButton">Search</button>
 		<button id="insertButton">Insert</button>
 		<button id="updateButton">Update</button>
@@ -34,9 +26,12 @@
 		<button id="resetButton">Reset</button><br>
 
 		<p id="response"></p>
+	
 
-
-		<table id="outputTable"></table>
+		
+		<table id="outputTable" style="width: 50%"></table>
+		
+			
 	</body>
 
 	<script src="phonebook.js"></script>

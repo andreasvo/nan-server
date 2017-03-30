@@ -14,6 +14,7 @@
 
 // This is a webserver for linux OS use
 // Calls another program (handler.c) for request handling, see handle.c source code for implementation guidelines
+// Andreas Vestgarden Olsen & Emil André Hansen (March 2017)
 
 #define LOCAL_PORT 80
 #define CON_QUEUE 10

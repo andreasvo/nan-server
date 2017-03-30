@@ -1,9 +1,34 @@
-table,th,td {
-  border : 1px solid black;
-  border-collapse: collapse;
+h1, li, form,  {
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 }
-th,td {
-  padding: 5px;
+
+button {
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+#outputTable {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#outputTable td, #outputTable th, #outputTable dv {
+    border: 1px solid #ddd;
+    padding: 8px;
+    max-width: 100px
+}
+
+#outputTable tr:nth-child(even){background-color: #f2f2f2;}
+
+#outputTable tr:hover {background-color: #ddd;}
+
+#outputTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+
 }
 
 .alert {
