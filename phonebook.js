@@ -1,3 +1,5 @@
+var tableAlive = 0;
+
 window.addEventListener("load", function() {
 	document.getElementById("searchButton").addEventListener("click", searchFunct, false);
 	document.getElementById("insertButton").addEventListener("click", insertFunct, false);
@@ -6,30 +8,49 @@ window.addEventListener("load", function() {
 	document.getElementById("resetButton").addEventListener("click", resetFunct, false);
 });
 
-function tableFunct(xml) {
+function resetFunct() {
+	document.getElementById("form").reset();
+	document.getElementById("response").innerHTML="";
+	document.getElementById("outputTable").innerHTML="";
+	
+	if (tableAlive == 1) {
+		document.getElementById("outputTable").innerHTML="";
+		tableAlive = 0;
+	}
+}
 
+function tableFunct(xml) {
 	var i;
 	var xml_string = xml.responseText;
-	var parser = new DOMParser();
-
-	var doc = parser.parseFromString(xml_string, "application/xml");
-
-	var table="<tr><th>ID</th><th>TLF</th><th>Name</th></tr>";
-  	var x = doc.getElementsByTagName("person");
-  	for (i = 0; i <x.length; i++) { 
-    table += "<tr><td>" +
-    x[i].getElementsByTagName("id")[0].childNodes[0].nodeValue +
-    "</td><td>" +
-    x[i].getElementsByTagName("tlf")[0].childNodes[0].nodeValue +
-    "</td><td>" +
-    x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue +
-    "</td></tr>";
-
+	
+	if (tableAlive == 1) {
+		document.getElementById("outputTable").textContent="";
+		tableAlive = 0;
 	}
 
- 	document.getElementById("response").innerHTML = "Database output:";
- 	document.getElementById("outputTable").innerHTML = table;
+	if (xml_string) {
+		var parser = new DOMParser();
 
+		var doc = parser.parseFromString(xml_string, "application/xml");
+
+		var table = "<tr><th>ID</th><th>TLF</th><th>Name</th></tr>";
+
+	  	var x = doc.getElementsByTagName("person");
+	  	for (i = 0; i <x.length; i++) { 
+		    table += "<tr><td>" +
+		    x[i].getElementsByTagName("id")[0].childNodes[0].nodeValue +
+		    "</td><td>" +
+		    x[i].getElementsByTagName("tlf")[0].childNodes[0].nodeValue +
+		    "</td><td>" +
+		    x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue +
+		    "</td></tr>";
+		}
+		
+		tableAlive = 1;
+ 	}
+
+ 	document.getElementById("response").innerHTML = "Database output:";
+	document.getElementById("outputTable").innerHTML = table;
 }
 
 function searchFunct() {
@@ -38,6 +59,12 @@ function searchFunct() {
 	var name = document.getElementsByName("NAME")[0].value;
 	var path;
 	xml_req = new XMLHttpRequest();
+
+	if (tableAlive == 1) {
+		document.getElementById("outputTable").textContent="";
+		tableAlive = 0;
+	}
+
 
 	if(id) {
 		path = "/webroot/incoming/"+id;
@@ -64,13 +91,19 @@ function insertFunct() {
 	var tlf = document.getElementsByName("TLF")[0].value;
 	var name = document.getElementsByName("NAME")[0].value;
 
+	if (tableAlive == 1) {
+		document.getElementById("outputTable").innerHTML="";
+		tableAlive = 0;
+	}
+
+
 	if (!id && !tlf) {
 		alert("ID and/or TLF cannot be empty!");
 		return;
 	}
 
 	if (!id) {
-		alert('ID cannot be empty!')
+		alert('ID cannot be empty!');
 		return;
 	}
 
@@ -102,6 +135,12 @@ function updateFunct() {
 	var id = document.getElementsByName("ID")[0].value;
 	var tlf = document.getElementsByName("TLF")[0].value;
 	var name = document.getElementsByName("NAME")[0].value;
+
+	if (tableAlive == 1) {
+		document.getElementById("outputTable").innerHTML="";
+		tableAlive = 0;
+	}
+
 
 	if (!id && !tlf) {
 		alert("ID and/or TLF cannot be empty!");
@@ -144,6 +183,12 @@ function deleteFunct() {
 	var path;
 	xml_req = new XMLHttpRequest();
 
+	if (tableAlive == 1) {
+		document.getElementById("outputTable").innerHTML="";
+		tableAlive = 0;
+	}
+
+
 	if(id) {
 		path = "/webroot/incoming/"+id;
 	} else {
@@ -157,10 +202,10 @@ function deleteFunct() {
 	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
 
-			document.getElementById("response").innerHTML=xml_req.responseText;
+			document.getElementById("response").textContent=xml_req.responseText;
 
 			if(!xml_req.responseText){
-				document.getElementById("response").innerHTML="Empty response, sorry!";
+				document.getElementById("response").textContent="Empty response, sorry!";
 			}
 		}
 	}

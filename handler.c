@@ -12,6 +12,7 @@
 
 // This program is a get/head/post/put/delete request handler for a the "server.c" webserver.
 // to call the function in other programs, keep in same folder and use #include "handler.c" then call "handleRequest();"
+// Andreas Vestgarden Olsen & Emil André Hansen (March 2017)
 
 #define BUFFSIZE 8000
 
@@ -169,7 +170,7 @@ void handleRequest() {
 
 	if(0 == strcmp(req, "GET")) {
 		bytes = 0;
-		while (bytes = read(fd, buffer, 1)) {
+		while (bytes = read(fd, buffer, BUFFSIZE)) {
 			byte_counter = bytes;
 			write(1, buffer, bytes);
 		}

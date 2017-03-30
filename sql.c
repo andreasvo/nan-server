@@ -6,7 +6,7 @@
 #include <sqlite3.h>
 
 // Handles xml parsing and sql actions for server.c via handle.c that calls it
-// Andreas Vestgarden Olsen (March 2017)
+// Andreas Vestgarden Olsen & Emil André (March 2017)
 
 void xml_parse(char* buf, int action);
 static int sql_handle (char* db_path, int action, int flag, int id, int tlf, char* name);
@@ -37,7 +37,7 @@ void xml_parse(char* buf, int action) {
                 input_size++;
                 j++;
             }
-            temp1 = (char*) malloc(input_size*2);
+            temp1 = (char*) malloc(input_size);
             memcpy(temp1, buf+(i+4), input_size);
             id = atoi(temp1);
             free(temp1);
@@ -52,7 +52,7 @@ void xml_parse(char* buf, int action) {
                 j++;
             }
             temp2 = (char*) malloc(input_size);
-            memcpy(temp2, buf+(i+5), input_size*2);
+            memcpy(temp2, buf+(i+5), input_size);
             tlf = atoi(temp2);
             free(temp2);
         }
@@ -100,7 +100,7 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
         if (-1 == id) {
             snprintf(sql, 99, "SELECT * FROM Phonebook;");
         } else {
-            snprintf(sql, 99, "SELECT * FROM Phonebook WHERE id=%d", id);
+            snprintf(sql, 99, "SELECT * FROM Phonebook WHERE id=%d;", id);
         }
         actionType = "search";
     }
@@ -144,10 +144,12 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
         printf("<phonebook>");
         rc = sqlite3_exec(db, sql, select_callback, 0, &zErrMsg);
         printf("</phonebook>");
+        free(sql);
     } else {
         printf("HTTP/1.1 200 OK\n");
         printf("Content-Type: text/plain\n\n");
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+        free(sql);
     }
 
     if ( rc != SQLITE_OK ) {
@@ -175,8 +177,6 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName){
 
 static int select_callback(void *NotUsed, int argc, char **argv, char **azColName){
    
-   //printf("<phonebook>");
-   
    int i;
    int person_count = 0;
    for(i=0; i<argc; i++) {
@@ -201,6 +201,7 @@ static int select_callback(void *NotUsed, int argc, char **argv, char **azColNam
            person_count++;
        }
    }
+
    return 0;
 }
 
