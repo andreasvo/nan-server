@@ -28,7 +28,7 @@ function tableFunct(xml) {
 		tableAlive = 0;
 	}
 
-	if (xml_string) {
+	if (xml_string.length > 23) {
 		var parser = new DOMParser();
 
 		var doc = parser.parseFromString(xml_string, "application/xml");
@@ -45,12 +45,14 @@ function tableFunct(xml) {
 		    x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue +
 		    "</td></tr>";
 		}
-		
-		tableAlive = 1;
- 	}
 
- 	document.getElementById("response").innerHTML = "Database output:";
-	document.getElementById("outputTable").innerHTML = table;
+		document.getElementById("outputTable").innerHTML = table;
+		document.getElementById("response").innerHTML = "Database output:";
+		tableAlive = 1;
+
+ 	} else {
+ 		document.getElementById("response").innerHTML = "Empty database!";
+ 	}
 }
 
 function searchFunct() {
@@ -91,12 +93,6 @@ function insertFunct() {
 	var tlf = document.getElementsByName("TLF")[0].value;
 	var name = document.getElementsByName("NAME")[0].value;
 
-	if (tableAlive == 1) {
-		document.getElementById("outputTable").innerHTML="";
-		tableAlive = 0;
-	}
-
-
 	if (!id && !tlf) {
 		alert("ID and/or TLF cannot be empty!");
 		return;
@@ -136,12 +132,6 @@ function updateFunct() {
 	var tlf = document.getElementsByName("TLF")[0].value;
 	var name = document.getElementsByName("NAME")[0].value;
 
-	if (tableAlive == 1) {
-		document.getElementById("outputTable").innerHTML="";
-		tableAlive = 0;
-	}
-
-
 	if (!id && !tlf) {
 		alert("ID and/or TLF cannot be empty!");
 		return;
@@ -160,17 +150,17 @@ function updateFunct() {
 	var xml_doc = "<phonebook><person><id>"+id+"</id><tlf>"+tlf+"</tlf><name>"+name+"</name></person></phonebook>";
 	xml_req = new XMLHttpRequest();
 
-	xml_req.open("PUT", "/webroot/incoming", true);
+	xml_req.open("PUT", "/webroot/incoming/"+id, true);
 
 	xml_req.send(xml_doc);
 
-	xml_req.onreadystatechange = function(){
+	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
 
-			document.getElementById("response").innerHTML=xml_req.responseText;
+			document.getElementById("response").textContent=xml_req.responseText;
 
 			if(!xml_req.responseText){
-				document.getElementById("response").innerHTML="Empty response, sorry!";
+				document.getElementById("response").textContent="Empty response, sorry!";
 			}
 		}
 	}
@@ -182,12 +172,6 @@ function deleteFunct() {
 	var name = document.getElementsByName("NAME")[0].value;
 	var path;
 	xml_req = new XMLHttpRequest();
-
-	if (tableAlive == 1) {
-		document.getElementById("outputTable").innerHTML="";
-		tableAlive = 0;
-	}
-
 
 	if(id) {
 		path = "/webroot/incoming/"+id;

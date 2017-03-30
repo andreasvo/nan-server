@@ -22,7 +22,7 @@ void handleRequest() {
 	int j = 0;
 	int a = 0;
 	int k = 0;
-	int fd;
+	int fd = -2;
 	int bytes;
 	int size = BUFFSIZE;
 	char* req;
@@ -52,6 +52,13 @@ void handleRequest() {
 
 	char* check = (char*) malloc(18);
 	memcpy(check, file, 18);
+
+	// If file is not specified in url, finds index.html as default
+	if (1 == j) {
+		file = "/index.html";
+		type = "html";
+	}
+
 
 	// GET: SEARCH and DELETE request
 	if((0 == strcmp(req, "DELETE") || 0 == strcmp(req, "GET")) && 0 == strcmp(check, "/webroot/incoming/")) {
@@ -104,6 +111,7 @@ void handleRequest() {
 		memcpy(xml_buf, buffer + i, byte_counter-i);
 		xml_buf[i+1] = '\0';
 
+
 		if (0 ==  strcmp(req, "POST")) {
 			xml_parse(xml_buf, 1);
 			exit(0);
@@ -117,10 +125,26 @@ void handleRequest() {
 			exit(0);
 		}
 	}
+
+	// tries to open the file, -1 returned if not found, else a filedescriptor referring to the file
+	fd = open(file, O_RDONLY);
+
+	if (-1 == fd && 0 != strcmp(check, "/webroot/incoming/") && 0 == strcmp(req, "GET")) {
+		printf("HTTP/1.1 404 NOT FOUND\n");
+		printf("Content-Type: text/html\n\n");
+		fd = open("404.html", O_RDONLY);
+
+		while (bytes = read(fd, buffer, BUFFSIZE)) {
+			byte_counter = bytes;
+			write(1, buffer, bytes);
+		}
+
+		exit(0);
+	}
 	
 	if (j > 1) {
 		// grabs the filetype
-		while (buffer[(i+a)+1] != '.') {
+		while (buffer[(i+a)+1] != '.' ) {
 			test = buffer[(i+a)+1];
 			a++;
 		}
@@ -140,11 +164,7 @@ void handleRequest() {
 	type[k+1] = '\0';
 
 
-	// If file is not specified in url, finds index.html as default
-	if (1 == j) {
-		file = "/index.html";
-		type = "html";
-	}
+	
 
 	// Checks if image	
 	if (0 == strcmp(type, "png") || 0 == strcmp(type, "jpg")) {
@@ -162,8 +182,6 @@ void handleRequest() {
 		mime = malloc(5);
 		mime = "text";
 	}
-
-	fd = open(file, O_RDONLY);
 
 	printf("HTTP/1.1 200 OK\n");
 	printf("Content-Type %s/%s\n\n", mime, type);
