@@ -6,14 +6,14 @@
 #include <sqlite3.h>
 
 // Handles xml parsing and sql actions for server.c via handle.c that calls it
-// Andreas Vestgarden Olsen & Emil André (March 2017)
+// Andreas Vestgarden Olsen & Emil André Hansen (March 2017)
 
-void xml_parse(char* buf, int action);
-static int sql_handle (char* db_path, int action, int flag, int id, int tlf, char* name);
-static int callback(void *NotUsed, int argc, char **argv, char **azColName);
+void xml_parse(char* buf, int action, int currentId);
+static int sql_handle(char* db_path, int action, int flag, int selectId, int id, int tlf, char* name);
 static int select_callback(void *NotUsed, int argc, char **argv, char **azColName);
+static int callback(void *NotUsed, int argc, char **argv, char **azColName);
 
-void xml_parse(char* buf, int action, int current) {
+void xml_parse(char* buf, int action, int currentId) {
 
     int tlf = 0;
     int flag = 0;
@@ -73,7 +73,6 @@ void xml_parse(char* buf, int action, int current) {
             while (buf[j] != '<' && buf[j+1] != '/') {
                 input_size++;
                 j++;
-                fprintf(stderr, "%d", input_size);
             }
 
             name = (char*) malloc(input_size+1);
@@ -91,11 +90,11 @@ void xml_parse(char* buf, int action, int current) {
         i++;
     }
 
-    sql_handle("/db/database.db", action, flag, id, tlf, name);
+    sql_handle("/db/database.db", action, flag, currentId, id, tlf, name);
     free(name);
 }
 
-static int sql_handle (char* db_path, int action, int flag, int id, int tlf, char* name) {
+static int sql_handle (char* db_path, int action, int flag, int selectId, int id, int tlf, char* name) {
     sqlite3* db;
     char* zErrMsg = 0;
     int rc;
@@ -115,10 +114,10 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
 
     /* Choose sql action */
     if (0 == action) {
-        if (-1 == id) {
+        if (-1 == selectId) {
             snprintf(sql, 99, "SELECT * FROM Phonebook;");
         } else {
-            snprintf(sql, 99, "SELECT * FROM Phonebook WHERE id=%d;", id);
+            snprintf(sql, 99, "SELECT * FROM Phonebook WHERE id=%d;", selectId);
         }
         actionType = "search";
     }
@@ -134,20 +133,32 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
     }
 
     else if (2 == action) {
-        if (-1 == flag) {
-            snprintf(sql, 99, "UPDATE Phonebook SET tlf=%d, name='' WHERE id=%d;", tlf, id);
+        if (-1 == id) {
+            if (-1 == flag) {
+                snprintf(sql, 99, "UPDATE Phonebook SET tlf=%d, name='' WHERE id=%d;", tlf, selectId);
+                fprintf(stderr, "1");
+            } else {
+                snprintf(sql, 99, "UPDATE Phonebook SET tlf=%d, name='%s' WHERE id=%d;", tlf, name, selectId);
+                fprintf(stderr, "2");
+            }
         } else {
-            snprintf(sql, 99, "UPDATE Phonebook SET tlf=%d, name='%s' WHERE id=%d;", tlf, name, id);
+            if (-1 == flag) {
+                snprintf(sql, 99, "UPDATE Phonebook SET id=%d, tlf=%d WHERE id=%d;", id, tlf, selectId);
+                fprintf(stderr, "3");
+            } else {
+                snprintf(sql, 99, "UPDATE Phonebook SET id=%d, tlf=%d, name='%s' WHERE id=%d;", id, tlf, name, selectId);
+                fprintf(stderr, "4");
+            }
         }
 
         actionType = "update";
     }
 
     else if (3 == action) {
-        if (-1 == id) {
+        if (-1 == selectId) {
             snprintf(sql, 99, "DELETE FROM Phonebook;");
         } else {
-            snprintf(sql, 99, "DELETE FROM Phonebook WHERE id=%d", id);
+            snprintf(sql, 99, "DELETE FROM Phonebook WHERE id=%d", selectId);
         }
 
         actionType = "delete";
@@ -180,7 +191,7 @@ static int sql_handle (char* db_path, int action, int flag, int id, int tlf, cha
       return 0;
     }
 
-static int callback(void *NotUsed, int argc, char **argv, char **azColName){
+static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 
    int i;
    for(i=0; i<argc; i++){

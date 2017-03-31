@@ -5,12 +5,15 @@
 		<link rel="stylesheet" type="text/css" href="main.css">
 
 	</head>
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+	
 	<body>
-		<h1>SQL Page</h1>
-		<li> <a href="index.html">Home</a> </li><br>
+		<h1>Your Phonebook</h1>
+		<a href="index.html" class="appButton">Home</a><br><br>
 
 		<form id="form">
+			Select Existing ID:<br>
+				<input type="text" name="oldID"><br><br>
 			ID:<br>
 				<input type="text" name="ID"><br>
 			TLF:<br>
@@ -19,16 +22,16 @@
 				<input type="text" name="NAME" maxlength="25">
 		</form><br>
 
-		<button id="searchButton">Search</button>
-		<button id="insertButton">Insert</button>
-		<button id="updateButton">Update</button>
-		<button id="deleteButton">Delete</button>
-		<button id="resetButton">Reset</button><br>
+		<button id="searchButton" class="appButton">Search</button>
+		<button id="insertButton" class="appButton">Insert</button>
+		<button id="updateButton" class="appButton">Update</button>
+		<button id="deleteButton" class="appButton">Delete</button>
+		<button id="resetButton" class="appButton">Reset</button><br>
 
 		<p id="response"></p>
 		
-		<table id="outputTable" style="width: 25%"></table>
-			
+		<table id="outputTable"></table>
+
 	</body>
 
 	<script src="phonebook.js"></script>

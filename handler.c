@@ -59,70 +59,72 @@ void handleRequest() {
 		type = "html";
 	}
 
-
-	// GET: SEARCH and DELETE request
-	if((0 == strcmp(req, "DELETE") || 0 == strcmp(req, "GET")) && 0 == strcmp(check, "/webroot/incoming/")) {
-
+	if (0 == strcmp(check, "/webroot/incoming/")) {
 		char* sw;
 		sw = (char*) malloc((j)-18);
 		memcpy(sw, file+18, (j)-18);
 		int id = atoi(sw);
+	
 
-		if (18 != j) {
-			if (0 == strcmp(req, "GET")) 
-				sql_handle ("/db/database.db", 0, -1, id, -1, "");
-			else if (0 == strcmp(req, "DELETE"))
-				sql_handle ("/db/database.db", 3, -1, id, -1, "");
+		// GET: SEARCH and DELETE request
+		if(0 == strcmp(req, "DELETE") || 0 == strcmp(req, "GET")) {
+
+			if (18 != j) {
+				if (0 == strcmp(req, "GET")) 
+					sql_handle ("/db/database.db", 0, -1, id, -1, -1, "");
+				else if (0 == strcmp(req, "DELETE"))
+					sql_handle ("/db/database.db", 3, -1, id, -1, -1, "");
 			
-			exit(0);
+				exit(0);
 
-		} else {
-			if (0 == strcmp(req, "GET")) 
-				sql_handle ("/db/database.db", 0, -1, -1, -1, "");
-			else if (0 == strcmp(req, "DELETE"))
-				sql_handle ("/db/database.db", 3, -1, -1, -1, "");
-
-			exit(0);
-		}
-	}
-
-	// POST or PUT request
-	if (0 == strcmp(req, "POST") || 0 == strcmp(req, "PUT")) {
-		int counter = 0;
-		i = 0;
-		while (i < byte_counter) {
-
-			if (counter == 2) {
-				break;
+			} else {
+				if (0 == strcmp(req, "GET")) 
+					sql_handle ("/db/database.db", 0, -1, -1, -1, -1, "");
+				else if (0 == strcmp(req, "DELETE"))
+					sql_handle ("/db/database.db", 3, -1, -1, -1, -1, "");
+	
+				exit(0);
 			}
-
-			if (buffer[i] == '\n') {
-				counter++;
-			}
-
-			if (buffer[i] != '\r' && buffer[i] != ' ' && buffer[i] != '\t' && buffer[i] != '\n') {
-				counter = 0;
-			}
-
-			i++;	
 		}
 
-		char* xml_buf = malloc(byte_counter+1 - i);
-		memcpy(xml_buf, buffer + i, byte_counter-i);
-		xml_buf[i+1] = '\0';
+		// POST or PUT request
+		if (0 == strcmp(req, "POST") || 0 == strcmp(req, "PUT")) {
+			int counter = 0;
+			i = 0;
+			while (i < byte_counter) {
+
+				if (counter == 2) {
+					break;
+				}
+
+				if (buffer[i] == '\n') {
+					counter++;
+				}
+
+				if (buffer[i] != '\r' && buffer[i] != ' ' && buffer[i] != '\t' && buffer[i] != '\n') {
+					counter = 0;
+				}
+
+				i++;	
+			}
+
+			char* xml_buf = malloc(byte_counter+1 - i);
+			memcpy(xml_buf, buffer + i, byte_counter-i);
+			xml_buf[i+1] = '\0';
 
 
-		if (0 ==  strcmp(req, "POST")) {
-			xml_parse(xml_buf, 1);
-			exit(0);
-		}
+			if (0 ==  strcmp(req, "POST")) {
+				xml_parse(xml_buf, 1, -1);
+				exit(0);
+			}
 
-		else if (0 == strcmp(req, "PUT")) {
-			xml_parse(xml_buf, 2);
-			exit(0);
-		} else {
-			printf("Something went wrong!");
-			exit(0);
+			else if (0 == strcmp(req, "PUT")) {
+				xml_parse(xml_buf, 2, id);
+				exit(0);
+			} else {
+				printf("Something went wrong!");
+				exit(0);
+			}
 		}
 	}
 
@@ -132,7 +134,7 @@ void handleRequest() {
 	if (-1 == fd && 0 != strcmp(check, "/webroot/incoming/") && 0 == strcmp(req, "GET")) {
 		printf("HTTP/1.1 404 NOT FOUND\n");
 		printf("Content-Type: text/html\n\n");
-		fd = open("404.html", O_RDONLY);
+		fd = open("./404.html", O_RDONLY);
 
 		while (bytes = read(fd, buffer, BUFFSIZE)) {
 			byte_counter = bytes;
