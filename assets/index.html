@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+    <title>Database App</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+
+    <body>
+        <h1>Your Phonebook</h1>
+
+        <form id="form">
+            Select Existing ID:<br>
+            <input type="text" name="oldID"><br><br>
+            ID:<br>
+            <input type="text" name="ID"><br>
+            TLF:<br>
+            <input type="text" name="TLF" maxlength="8"><br>
+            Name:<br>
+            <input type="text" name="NAME" maxlength="25">
+        </form><br>
+
+        <button id="searchButton" class="appButton">Search</button>
+        <button id="insertButton" class="appButton">Insert</button>
+        <button id="updateButton" class="appButton">Update</button>
+        <button id="deleteButton" class="appButton">Delete</button>
+        <button id="resetButton" class="appButton">Reset</button>
+        <button id="testButton" class="appButton">Test</button><br>
+
+        <p id="response"></p>
+        <p id="testResponse"></p>
+
+        <table id="outputTable"></table> <br>
+        <table id="phoneTable"></table>
+    </body>
+
+    <script src="phonebook.js"></script>
+</html>

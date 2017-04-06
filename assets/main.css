@@ -1,0 +1,79 @@
+html, body {
+    height: 100%;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: top;
+}
+
+h1, li, form,  {
+    text-decoration-color: white;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+.appButton {
+    background-color: #50d07d; /* Green */
+    border: none;
+    color: white;
+    padding: 4px 5px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.appButton:hover {
+    background-color: #40c04d;
+
+}
+
+.appButton:active {
+    background-color: #20a02d;
+
+}
+
+#outputTable {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#outputTable td, #outputTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    max-width: 100px
+}
+
+#outputTable tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/*#outputTable tr:hover {
+    background-color: #ddd;
+}*/
+
+#outputTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #50d07d;
+    color: white;
+
+}
+
+.alert {
+    padding: 20px;
+    background-color: #999;
+    width: 30%;
+    border-radius: 15px;
+    color: white;
+    margin-top: 10px;
+}
