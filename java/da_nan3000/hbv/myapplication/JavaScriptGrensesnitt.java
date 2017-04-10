@@ -1,19 +1,14 @@
 package da_nan3000.hbv.myapplication;
 
-import java.util.ArrayList;
-import android.app.Activity;
-import android.content.ContentProviderOperation;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.RawContacts;
-import android.provider.ContactsContract.RawContacts.Data;
 import android.widget.Toast;
+import android.support.v4.content.ContextCompat;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+
+
 
 public class JavaScriptGrensesnitt extends android.app.Activity {
 
@@ -25,41 +20,56 @@ public class JavaScriptGrensesnitt extends android.app.Activity {
     }
 
     @android.webkit.JavascriptInterface
-    protected String getContacts(String searchID) {
-
-        android.webkit.WebView wv = new android.webkit.WebView(this);
-        setContentView(wv);
-
+    public String getContacts(String id) {
         String xml = "<phonebook>";
-        String id = "";
-        String name = "";
-        String tlf = "";
 
-        Cursor k = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        if(k.getCount() > 0) {
 
-            while (k.moveToNext()) {
-
-                id = k.getString(k.getColumnIndex(ContactsContract.Contacts._ID));
-
-                name = k.getString(k.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-
-                tlf = k.getString(k.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-                xml += "<person><id>" + id + "</id><tlf>" + tlf + "</tlf><name>" + name + "</name></person>";
-            }
+        if (ContextCompat.checkSelfPermission(kontekst, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            visToast("Required persmissions missing...");
+            return xml + "</phonebook>";
         }
 
+        Cursor k = kontekst.getContentResolver().query(Contacts.CONTENT_URI, null, null, null, Contacts._ID);
+        if (k.getCount() > 0) {
+            while (k.moveToNext()) {
+
+                if (k.getString(k.getColumnIndex(Contacts._ID)).equals(id) || id.equals("all")) {
+                    if (!k.getString(k.getColumnIndex(Contacts.HAS_PHONE_NUMBER)).equals("1")) {
+                        continue;
+                    }
+
+                    xml += "<person>";
+
+                    xml += "<id>" + k.getString(k.getColumnIndex(Contacts._ID)) + "</id>";
+                    xml += "<tlf>" + getPhoneNumbers(k.getString(k.getColumnIndex(Contacts._ID))) + "</tlf>";
+                    xml += "<name>" + k.getString(k.getColumnIndex(Contacts.DISPLAY_NAME)) + "</name>";
+
+
+                    xml += "</person>";
+                }
+            }
+        }
         k.close();
-        wv.loadData(xml,"application/xml","utf-8");
+
         xml += "</phonebook>";
-
         return xml;
-
     }
 
-    @android.webkit.JavascriptInterface   // ved target >= 17 må dette være med
-    public void visToast(String tekst) {
-        Toast.makeText(kontekst, tekst, android.widget.Toast.LENGTH_SHORT).show();
+    @android.webkit.JavascriptInterface
+    public String getPhoneNumbers(String id) {
+        String phonenumbers = "";
+
+        Cursor n = kontekst.getContentResolver().query(Phone.CONTENT_URI, null, Phone.CONTACT_ID + " = " + id, null, null);
+        while (n.moveToNext()) {
+            phonenumbers += n.getString(n.getColumnIndex(Phone.NUMBER)) + "\r\n";
+        }
+        n.close();
+
+        return phonenumbers;
+    }
+
+    @android.webkit.JavascriptInterface
+    public void visToast(String text) {
+        Toast.makeText(kontekst, text, android.widget.Toast.LENGTH_SHORT).show();
     }
 }

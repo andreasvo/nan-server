@@ -1,45 +1,42 @@
 var tableAlive = 0;
+var phoneTableAlive = 0;
+var ip = "http://10.250.100.191/webroot/incoming/";
 
 window.addEventListener("load", function() {
 	document.getElementById("searchButton").addEventListener("click", searchFunct, false);
 	document.getElementById("insertButton").addEventListener("click", insertFunct, false);
 	document.getElementById("updateButton").addEventListener("click", updateFunct, false);
 	document.getElementById("deleteButton").addEventListener("click", deleteFunct, false);
-	document.getElementById("testButton").addEventListener("click", testFunct, false);
 	document.getElementById("resetButton").addEventListener("click", resetFunct, false);
 });
 
-function testFunct() {
-    var blyat = javascriptGrensesnitt.getContacts("");
-}
-
 function resetFunct() {
 	document.getElementById("form").reset();
-	document.getElementById("response").innerHTML="";
-	document.getElementById("outputTable").innerHTML="";
-
-	if (tableAlive == 1) {
-		document.getElementById("outputTable").innerHTML="";
-		tableAlive = 0;
-	}
+	document.getElementById("response").textContent="";
+	document.getElementById("phoneResponse").textContent="";
+	document.getElementById("outputTable").textContent="";
+	document.getElementById("phoneTable").textContent="";
+	tableAlive = 0;
 }
 
-function tableFunct(xml, identifier) {
-	var xml_string = xml.responseText;
+function tableFunct(xml_string, identifier) {
 	var emptyReply = "<phonebook></phonebook>";
 
-	if (tableAlive == 1) {
-		document.getElementById("outputTable").textContent="";
-		tableAlive = 0;
+	if (tableAlive) {
+	    document.getElementById("outputTable").textContent="";
+	    tableAlive = 0;
+	}
+	if (phoneTableAlive) {
+	    document.getElementById("phoneTable").textContent="";
+	    phoneTableAlive = 0;
 	}
 
 	if (xml_string.length > emptyReply.length) {
 
 		var parser = new DOMParser();
-
 		var doc = parser.parseFromString(xml_string, "application/xml");
-
 		var table = "<tr><th>ID</th><th>TLF</th><th>Name</th></tr>";
+
 	  	var x = doc.getElementsByTagName("person");
 
 	  	for (var i = 0; i < x.length; i++) {
@@ -62,17 +59,28 @@ function tableFunct(xml, identifier) {
 
 		}
 
-        //if (identifier == "server") {
+        if (identifier == "server") {
             document.getElementById("outputTable").innerHTML = table;
             document.getElementById("response").innerHTML = "Database output:";
-        /*}
+            tableAlive=1;
+        }
 
         else if (identifier == "phone") {
             document.getElementById("phoneTable").innerHTML = table;
-        }*/
+            document.getElementById("phoneResponse").innerHTML = "Phone output:";
+            tableAlive=1;
+        }
 
- 	} else {
- 		document.getElementById("response").innerHTML = "Not available";
+ 	}
+
+ 	else if (identifier == "server") {
+ 	    document.getElementById("outputTable").textContent="";
+ 	    document.getElementById("response").textContent = "Contact does not exist on server!"
+ 	}
+
+ 	else if (identifier == "phone") {
+ 	    document.getElementById("phoneTable").textContent="";
+ 		document.getElementById("phoneResponse").textContent = "Contact does not exist on phone!";
  	}
 }
 
@@ -89,9 +97,9 @@ function searchFunct() {
 
 
 	if(id) {
-		path = "http://192.168.42.116/webroot/incoming/"+id;
+		path = ip+id;
 	} else {
-		path = "http://192.168.42.116/webroot/incoming/";
+		path = ip;
 	}
 
 	xml_req.open("GET", path, true);
@@ -100,21 +108,15 @@ function searchFunct() {
 
 	xml_req.onreadystatechange = function() {
 		if (xml_req.readyState == XMLHttpRequest.DONE) {
-			tableFunct(this, "server");
+			tableFunct(xml_req.responseText, "server");
 		}
 	}
 
-	phone_xml = "";
-
 	if (id) {
-	    tableFunct(javascriptGrensesnitt.getContacts(), "phone");
+	    tableFunct(javascriptGrensesnitt.getContacts(id), "phone");
 	} else {
-	    tableFunct(javascriptGrensesnitt.getContacts(), "phone");
+	    tableFunct(javascriptGrensesnitt.getContacts("all"), "phone");
 	}
-
-	var t = javascriptGrensesnitt.getContacts();
-
-    document.getElementById("response").innerHTML=t;
 }
 
 function insertFunct() {
@@ -140,7 +142,7 @@ function insertFunct() {
 	var xml_doc = "<phonebook><person><id>"+id+"</id><tlf>"+tlf+"</tlf><name>"+name+"</name></person></phonebook>";
 	xml_req = new XMLHttpRequest();
 
-	xml_req.open("POST", "http://192.168.42.116/webroot/incoming/", true);
+	xml_req.open("POST", ip, true);
 
 	xml_req.send(xml_doc);
 
@@ -184,7 +186,7 @@ function updateFunct() {
 	var xml_doc = "<phonebook><person><id>"+id+"</id><tlf>"+tlf+"</tlf><name>"+name+"</name></person></phonebook>";
 	xml_req = new XMLHttpRequest();
 
-	xml_req.open("PUT", "http://192.168.42.116/webroot/incoming/"+oldId, true);
+	xml_req.open("PUT", ip+oldId, true);
 
 	xml_req.send(xml_doc);
 
@@ -206,9 +208,9 @@ function deleteFunct() {
 	xml_req = new XMLHttpRequest();
 
 	if(id) {
-		path = "http://192.168.42.116/webroot/incoming/"+id;
+		path = ip+id;
 	} else {
-		path = "http://192.168.42.116/webroot/incoming/";
+		path = ip;
 	}
 
 	xml_req.open("DELETE", path, true);
